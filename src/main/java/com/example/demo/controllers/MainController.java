@@ -3,7 +3,7 @@ package com.example.demo.controllers;
 import com.example.demo.dto.*;
 import com.example.demo.service.UserService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -37,25 +37,29 @@ public class MainController {
         return ResponseEntity.ok("Bio updated");
     }
     @PostMapping("/change-username")
-    public ResponseEntity changeUsername(@RequestBody UserAuthDto userAuthDto) {
-        boolean updated = userService.changeUsername(userAuthDto);
+    public ResponseEntity<?> changeUsername(@RequestBody UsernameDto usernameDto) {
+        boolean updated = userService.changeUsername(usernameDto);
 
         if (!updated) {
-            return ResponseEntity.status(401).body("Invalid credentials");
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body("Invalid credentials or username already in use");
         }
 
-        return ResponseEntity.ok("username updated");
+        return ResponseEntity.ok("Username successfully updated");
     }
 
     @PostMapping("/change-password")
-    public ResponseEntity changePassword(@RequestBody EmailDto emailDto) {
-        boolean updated = userService.changePassword(emailDto);
+    public ResponseEntity<?> changePassword(@RequestBody PasswordDto passwordDto) {
+        boolean updated = userService.changePassword(passwordDto);
 
         if (!updated) {
-            return ResponseEntity.status(401).body("Invalid credentials");
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body("Invalid credentials or username already in use");
         }
 
-        return ResponseEntity.ok("password updated");
+        return ResponseEntity.ok("password successfully updated");
     }
 }
 

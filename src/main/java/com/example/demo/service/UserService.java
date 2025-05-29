@@ -110,35 +110,44 @@ public class UserService {
         return true;
     }
 
-    public boolean changeUsername(UserAuthDto userAuthDto) {
-        String username = userAuthDto.getUsername();
-        String password = userAuthDto.getPassword();
+    public boolean changeUsername(UsernameDto usernameDto) {
+        String username = usernameDto.getUsername();
+        String password = usernameDto.getPassword();
+        String newUsername = usernameDto.getNewUsername();
 
-        Optional<User> userOpt = userRepo.findByDataPublicDataUsernameAndDataPrivateDataPassword(username, password);
+        Optional<User> userOpt = userRepo.findByDataPublicDataUsernameAndDataPrivateDataPassword(
+                username,
+                password
+        );
 
         if (userOpt.isEmpty()) {
-            System.out.println("Target user not found");
+            System.out.println("Invalid username or password");
             return false;
         }
 
-        if (userRepo.existsByDataPublicDataUsername(username)) {
+        if (username.equals(newUsername)) {
+            System.out.println("New username is the same as current username");
+            return false;
+        }
+
+        if (userRepo.existsByDataPublicDataUsername(newUsername)) {
             System.out.println("Username already taken");
             return false;
         }
 
-
         User user = userOpt.get();
-        user.getData().getPublicData().setUsername(username);
+        user.getData().getPublicData().setUsername(newUsername);
         userRepo.save(user);
 
-        System.out.println("Username updated for " + username);
+        System.out.println("Username updated from " + username + " to " + newUsername);
         return true;
     }
 
-    public boolean changePassword(EmailDto emailDto) {
-        String username = emailDto.getUsername();
-        String password = emailDto.getPassword();
-        String email = emailDto.getEmail();
+    public boolean changePassword(PasswordDto passwordDto) {
+        String username = passwordDto.getUsername();
+        String email = passwordDto.getEmail();
+        String password = passwordDto.getPassword();
+        String newPassword = passwordDto.getNewPassword();
 
         Optional<User> userOpt = userRepo.findByDataPublicDataUsernameAndDataPrivateDataPasswordAndDataPrivateDataEmail(username, password, email);
 
@@ -148,10 +157,10 @@ public class UserService {
         }
 
         User user = userOpt.get();
-        user.getData().getPrivateData().setPassword(password);
+        user.getData().getPrivateData().setPassword(newPassword);
         userRepo.save(user);
 
-        System.out.println("Password updated for " + username);
+        System.out.println("Password updated for " + username + " the new password is " + newPassword);
         return true;
     }
 
