@@ -1,8 +1,6 @@
 package com.example.demo.controllers;
 
-import com.example.demo.dto.FollowDto;
-import com.example.demo.dto.UserAuthDto;
-import com.example.demo.dto.UserDto;
+import com.example.demo.dto.*;
 import com.example.demo.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,6 +24,38 @@ public class MainController {
     public ResponseEntity follow(@RequestBody FollowDto followDto) {
         userService.follow(followDto);
         return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/change-bio")
+    public ResponseEntity changeBio(@RequestBody BioDto bioDto) {
+        boolean updated = userService.changeBio(bioDto);
+
+        if (!updated) {
+            return ResponseEntity.status(401).body("Invalid credentials");
+        }
+
+        return ResponseEntity.ok("Bio updated");
+    }
+    @PostMapping("/change-username")
+    public ResponseEntity changeUsername(@RequestBody UserAuthDto userAuthDto) {
+        boolean updated = userService.changeUsername(userAuthDto);
+
+        if (!updated) {
+            return ResponseEntity.status(401).body("Invalid credentials");
+        }
+
+        return ResponseEntity.ok("username updated");
+    }
+
+    @PostMapping("/change-password")
+    public ResponseEntity changePassword(@RequestBody EmailDto emailDto) {
+        boolean updated = userService.changePassword(emailDto);
+
+        if (!updated) {
+            return ResponseEntity.status(401).body("Invalid credentials");
+        }
+
+        return ResponseEntity.ok("password updated");
     }
 }
 

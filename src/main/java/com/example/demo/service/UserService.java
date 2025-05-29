@@ -1,13 +1,12 @@
 package com.example.demo.service;
 
-import com.example.demo.dto.FollowDto;
-import com.example.demo.dto.UserAuthDto;
-import com.example.demo.dto.UserDto;
+import com.example.demo.dto.*;
 import com.example.demo.model.User;
 import com.example.demo.repository.UserRepo;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Optional;
 
 @Service
 public class UserService {
@@ -89,6 +88,71 @@ public class UserService {
 
         System.out.println(authUser.getData().getPublicData().getUsername()
                 + " now follows " + targetUsername);
+    }
+
+    public boolean changeBio(BioDto bioDto) {
+        String username = bioDto.getUsername();
+        String password = bioDto.getPassword();
+        String newBio = bioDto.getBio();
+
+        Optional<User> userOpt = userRepo.findByDataPublicDataUsernameAndDataPrivateDataPassword(username, password);
+
+        if (userOpt.isEmpty()) {
+            System.out.println("Target user not found");
+            return false;
+        }
+
+        User user = userOpt.get();
+        user.getData().getPublicData().setBio(newBio);
+        userRepo.save(user);
+
+        System.out.println("Bio updated for " + username);
+        return true;
+    }
+
+    public boolean changeUsername(UserAuthDto userAuthDto) {
+        String username = userAuthDto.getUsername();
+        String password = userAuthDto.getPassword();
+
+        Optional<User> userOpt = userRepo.findByDataPublicDataUsernameAndDataPrivateDataPassword(username, password);
+
+        if (userOpt.isEmpty()) {
+            System.out.println("Target user not found");
+            return false;
+        }
+
+        if (userRepo.existsByDataPublicDataUsername(username)) {
+            System.out.println("Username already taken");
+            return false;
+        }
+
+
+        User user = userOpt.get();
+        user.getData().getPublicData().setUsername(username);
+        userRepo.save(user);
+
+        System.out.println("Username updated for " + username);
+        return true;
+    }
+
+    public boolean changePassword(EmailDto emailDto) {
+        String username = emailDto.getUsername();
+        String password = emailDto.getPassword();
+        String email = emailDto.getEmail();
+
+        Optional<User> userOpt = userRepo.findByDataPublicDataUsernameAndDataPrivateDataPasswordAndDataPrivateDataEmail(username, password, email);
+
+        if (userOpt.isEmpty()) {
+            System.out.println("Target user not found");
+            return false;
+        }
+
+        User user = userOpt.get();
+        user.getData().getPrivateData().setPassword(password);
+        userRepo.save(user);
+
+        System.out.println("Password updated for " + username);
+        return true;
     }
 
 }
